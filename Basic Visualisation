@@ -1,0 +1,35 @@
+library(ggplot2)
+str(diamonds)
+str(mpg)
+str(economics)
+
+ggplot(data=diamonds,mapping=aes(x=price))+
+  geom_density(bw=300)
+  geom_histogram(bins = 50, boundary=0, fill="blue", color="white")
+  
+ggplot(data=mpg,mapping=aes(y=cty))+
+  geom_boxplot(notch=T)
+  
+ggplot(data=diamonds, mapping=aes(x=clarity))+
+  geom_bar(fill="lightblue")
+
+ggplot(data=diamonds, mapping=aes(x=carat, y=price))+
+  geom_hex()
+
+ggplot(data=diamonds, mapping=aes(x=carat, y=price))+
+  geom_point(size=0.1, alpha=0.2)+
+  scale_x_log10()+
+  scale_y_log10()
+
+ggplot(data=economics, mapping=aes(x=date, y=unemploy))+
+  geom_line()
+
+ggplot(data=diamonds, mapping=aes(x=cut, y=price))+
+  geom_boxplot(notch=T)
+
+ggplot(data=diamonds, mapping = aes(x=cut, y=price))+
+  geom_violin()+
+  coord_flip()
+
+ggplot(data=mpg, mapping = aes(x=cyl, y=cty))+
+  geom_point(position = "jitter")
