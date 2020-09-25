@@ -1,0 +1,59 @@
+## Read
+library(tidyverse)
+ao <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-07-21/animal_outcomes.csv')
+summary(ao)
+head(ao)
+
+## Line chart - year vs AuTotal (outcome)
+ao%>%
+  group_by(year, outcome)%>%
+  summarise(Au_Total = 
+              sum(Total, na.rm = TRUE)) -> Au_Total
+Au_Total
+ggplot(Au_Total, aes(year, Au_Total, colour = outcome)) +
+  geom_path(size = 0.8)   # huge reduction in Euthanized in Au
+
+## Line chart - year vs regional total
+pivot_longer(ao,
+             cols = c(-year, -animal_type, -outcome, -Total),
+             names_to = 'Region', values_to = 'Value')%>%
+  group_by(year, Region)%>%
+  summarise(Region_Yearly = 
+              sum(Value, na.rm = TRUE)) -> ao_long
+ao_long
+ggplot(ao_long, aes(year, Region_Yearly, col = Region)) + 
+  geom_path(size = 0.8)  # Only QLD and NT showed increase, QLD being highest
+
+## Line chart - year vs QLD (animal type)
+ao%>%
+  group_by(year, animal_type)%>%
+  summarise(QLD_num = 
+              sum(QLD, na.rm = TRUE)) -> ao_qld
+ao_qld%>%
+  ggplot(aes(year, QLD_num, col = animal_type)) +
+  geom_path(size = 0.8)  # The increase of cats induced huge rise in QLD
+
+## bar plot - 2018 QLD cats outcome
+ao%>%
+  filter(year == 2018, animal_type == "Wildlife")%>%
+  select(year, animal_type, outcome, QLD) -> qld_cats
+ggplot(qld_cats, aes(outcome, QLD)) +   # most Wildlife were rehomed
+  geom_bar(position="dodge", stat="identity", fill = "orange", col = "black")
+
+## bar plot - regional total outcome
+pivot_longer(ao,
+             cols = c(-year, -animal_type, -outcome, -Total),
+             names_to = 'Region', values_to = 'Value')%>%
+  group_by(year, Region, outcome)%>%
+  summarise(Region_Yearly = 
+              sum(Value, na.rm = TRUE))%>%
+  filter(year >= 2016) -> ao_long1
+
+ggplot(ao_long1, aes(Region, Region_Yearly, fill = outcome)) + 
+  geom_bar(position="dodge", stat="identity")  # QLD has the highest Euthanized
+
+## pie chart
+ggplot(qld_cats, aes(x = "", y = QLD, fill = outcome)) +
+  geom_bar(stat="identity", width=1, color="white") +
+  coord_polar("y", start=0) + theme_void() +
+  scale_fill_brewer(palette="Set1")  # Rehomed animals -> largest proportion
