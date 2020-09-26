@@ -34,3 +34,10 @@ ggplot(data=diamonds, mapping = aes(x=cut, y=price))+
 
 ggplot(data=mpg, mapping = aes(x=cyl, y=cty))+
   geom_point(position = "jitter")
+  
+ ####
+ library(tidyverse) will load the core tidyverse packages:ggplot2, for data visualisation. (画图，可视化数据) dplyr, for data manipulation. 
+ (操控数据，过滤、排序等) tidyr, for data tidying. (清理数据，转为ggplot可用的格式) readr, for data import. (从文件中读取数据) purrr, for functional programming. 
+ (提供好用的编程函数) tibble, for tibbles, a modern re-imagining of data frames. (data.frame升级款) stringr, for strings. (处理字符，查找、替换等) 
+ forcats, for factors. (处理因子问题)
+
