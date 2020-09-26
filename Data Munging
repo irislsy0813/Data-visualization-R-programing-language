@@ -1,0 +1,68 @@
+#### get data from web
+
+download.file("https://www.aemo.com.au/aemo/data/nem/priceanddemand/PRICE_AND_DEMAND_202009_NSW1.csv")
+data<-read_csv("PRICE_AND_DEMAND_202009_NSW1.csv")
+data
+
+#### get data from html
+library(rvest)
+
+html<-read_html("https://finance.yahoo.com/quote/AAPL/analysis?p=AAPL")
+tab<-html_table(html)
+print(tab)
+
+#######
+library(tidyverse)
+str(diamonds)
+
+selected1<-select (diamonds, carat, cut, price)
+selected2<-select(diamonds, -carat, -cut, -price)
+
+filter(diamonds, (price>1000))
+
+##"&"= and
+filter(diamonds, (price>1000)&(cut=="Ideal"))
+
+##"|"= or
+filter(diamonds, (cut=="Ideal")|(color=="E"))
+
+filter(diamonds, (cut %in% c("Ideal","Fair")))
+
+##equal
+filter(diamonds, (cut=="Fair") | (cut=="Ideal"))
+
+filter(diamonds, !(cut %in% c("Ideal","Fair")))
+
+###mutate() adds new variables and preserves existing ones; 
+###transmute() adds new variables and drops existing ones. 
+
+mpgsel<-select(mpg,cty,hwy)
+mpgMet<-mutate(mpgsel,ctyMetric=0.425144*cty,hwyMetric=0.425144*hwy)
+mpgMet
+
+###
+c(1,12,4)%>%
+  mean%>%
+  sqrt->out
+
+mpgsel<-select(mpg,cty,hwy)
+mpgMet<-mutate(mpgsel,ctyMetric=0.425144*cty,hwyMetric=0.425144*hwy)
+mpgMet
+
+select(mpg,cty,hwy)%>%
+  mutate(ctyMetric=0.425144*cty,hwyMetric=0.425144*hwy)->mpgMet
+mpgMet
+
+###
+library(tidyverse)
+
+txhousing%>%
+  group_by(year)%>%
+  summarise(totalsales=sum(sales,na.rm = TRUE))->totsales
+totsales
+
+txhousing%>%
+  group_by(year,city)%>%
+  summarise(totalsales=sum(sales,na.rm = TRUE))->totsales2
+totsales2
+  
