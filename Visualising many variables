@@ -1,0 +1,170 @@
+library(ggplot2)
+
+ggplot(data = mpg, mapping=aes(x=displ,y=cty,color=drv,size=cyl))+
+  geom_point()
+
+ggplot(data=mpg,mapping = aes(x=displ,y=cty,label=drv))+
+  geom_text()
+
+ggplot(data=diamonds,mapping = aes(y=price,x=carat,color=cut))+
+  geom_point(size=0.2)
+
+##change the color by viridis
+
+ggplot(data=mpg, mapping=aes(x=displ, y=cty, col=hwy))+
+  geom_point()+ scale_color_viridis_c()
+
+##choose option
+ggplot(data=mpg, mapping=aes(x=displ, y=cty, col=hwy))+
+  geom_point()+ scale_color_viridis_c(option = "C")
+
+## Divergent Scale --remove background color and line
+
+ggplot(data=mpg, mapping=aes(x=displ, y=cty, col=hwy))+
+  geom_point()+ scale_color_distiller(type = "div")+
+  theme_set(theme_bw())+
+  theme(panel.grid.major=element_line(colour=NA))
+ 
+##facet wrap 缠绕分面
+
+head(txhousing)
+
+ggplot(data=txhousing, aes(x=date, y=sales))+
+  geom_line()+
+  facet_wrap(~city,scales = "free")
+
+
+## facets：分面参数如 ~cut，表示用 cut 变量进行数据分类
+## nrow：绘制图形的行数
+## ncol：绘制图形的列数，一般nrow/ncol只设定一个即可
+## scales：坐标刻度的范围，可以设定四种类型。fixed 表示所有小图均使用统一坐标范围；free表示每个小图按照各自数据范围自由调整坐标刻度范围；free_x为自由调整x轴刻度范围；free_y为自由调整y轴刻度范围。
+## shrinks：也和坐标轴刻度有关，如果为TRUE（默认值）则按统计后的数据调整刻度范围，否则按统计前的数据设定坐标。
+## as.table：和小图排列顺序有关的选项。如果为TRUE（默认）则按表格方式排列，即最大值（指分组level值）排在表格最后即右下角，否则排在左上角。
+## drop：是否丢弃没有数据的分组，如果为TRUE（默认），则空数据组不绘图。
+
+
+##facet grid 网格分面
+ggplot(data=diamonds, mapping=aes(x=carat,y=price,color=clarity))+
+  geom_point()+
+  facet_grid(row=vars(cut),cols=vars(color))
+
+## margins 它是指用于分面的包含每个变量元素所有数据的数据组。
+## pace和scale 如果为fixed（默认），所有小图的大小都一样，如果为free/free_x/free_y，小图的大小将按照坐标轴的跨度比例进行设置。
+##qplot(carat, price, data=diamonds, alpha=I(0.2))+ facet_grid(color~cut, space="free_x", scales="free_x")
+
+head(txhousing)
+ggplot(data=txhousing,mapping = aes(x=sales,y=median))+
+  geom_point()+
+  facet_grid(row = vars(year),col= vars(month))+
+  theme(strip.text = element_text(size=3))
+
+## theme(element_name = element_function())
+## element_text(), 文本，一般用于控制标签和标题的字体风格
+## element_line(), 线条，一般用于控制线条或线段的颜色或线条类型
+## element_rect(), 矩形区域，一般用于控制背景矩形的颜色或者边界线条类型
+## element_blank() , 空白，就是不分配相应的绘图空间，即删去这个地方的绘图元素
+
+
+##paris plot and parallel coordinates
+
+library(GGally)
+
+ggpairs(economics)
+
+ggpairs(iris)
+
+ggparcoord(iris)
+
+
+##change theme
+
+library(tidyverse)
+library(ggplot2)
+
+##数据整理
+df <- mpg %>% 
+  as_tibble() %>% 
+  filter(class != "2seater", manufacturer %in% c("toyota", "volkswagen"))
+df
+
+##画图
+df %>%
+  ggplot(aes(x = displ, y = hwy, color = factor(cyl))) +
+  geom_point() +
+  facet_grid(vars(manufacturer), vars(class)) +
+  ggtitle("title") +
+  labs(x = "x_displ", y = "y_hwy")
+
+##修改整个图表plot.***
+
+df %>%
+  ggplot(aes(x = displ, y = hwy, color = factor(cyl))) +
+  geom_point() +
+  facet_grid(vars(manufacturer), vars(class)) +
+  ggtitle("title") +
+  labs(x = "x_displ", y = "y_hwy") +
+  theme(
+    plot.background = element_rect(fill = "orange", color = "black", size = 10),
+    plot.title = element_text(hjust = 1, color = "red", face = "italic"),
+    plot.margin = margin(t = 20, r = 20, b = 20, l = 20, unit = "pt")
+  )
+
+##修改坐标轴axis。***
+
+ggplot(data=df, aes(x = displ, y = hwy, color = factor(cyl))) +
+  geom_point() +
+  facet_grid(vars(manufacturer), vars(class)) +
+  ggtitle("title") +
+  labs(x = "x_displ", y = "y_hwy") +
+  theme(
+    axis.line = element_line(color = "orange", size = 2),
+    axis.title = element_text(color = "red", face = "italic"),
+    axis.ticks = element_line(color = "purple", size = 3), #坐标轴刻度
+    axis.text = element_text(color = "blue"),#坐标轴标签
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+
+##修改面板panel.***
+
+df %>%
+  ggplot(aes(x = displ, y = hwy, color = factor(cyl))) +
+  geom_point() +
+  facet_grid(vars(manufacturer), vars(class)) +
+  ggtitle("title") +
+  labs(x = "x_displ", y = "y_hwy") +
+  theme(
+    panel.background = element_rect(fill = "orange"),
+    panel.grid = element_line(color = "grey80", size = 0.5), #面板网格线
+    panel.border = element_rect(color = "red", fill = NA)
+  )
+
+##修改图例
+df %>%
+  ggplot(aes(x = displ, y = hwy, color = factor(cyl))) +
+  geom_point() +
+  facet_grid(vars(manufacturer), vars(class)) +
+  ggtitle("title") +
+  labs(x = "x_displ", y = "y_hwy") +
+  theme(
+    legend.background = element_rect(fill = "orange"),
+    legend.title = element_text(color = "blue", size = 10),
+    legend.key = element_rect(fill = "grey80"), #图例符号
+    legend.text = element_text(color = "red"),#图例标签
+    legend.margin = margin(t = 20, r = 20, b = 20, l = 20, unit = "pt"), #图例边距
+    legend.position = "bottom"
+  )
+
+##修改分面板 strip.**
+
+df %>%
+  ggplot(aes(x = displ, y = hwy, color = factor(cyl))) +
+  geom_point() +
+  facet_grid(vars(manufacturer), vars(class)) +
+  ggtitle("title") +
+  labs(x = "x_displ", y = "y_hwy") +
+  theme(
+    strip.background = element_rect(fill = "orange"),
+    strip.text = element_text(color = "red"),
+    panel.spacing = unit(0.3, "inch") #分面间隔 ,
+    # strip.switch.pad.grid =
+  )
