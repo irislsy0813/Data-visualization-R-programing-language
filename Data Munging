@@ -11,7 +11,7 @@ html<-read_html("https://finance.yahoo.com/quote/AAPL/analysis?p=AAPL")
 tab<-html_table(html)
 print(tab)
 
-#######
+#######selected and filter data
 library(tidyverse)
 str(diamonds)
 
@@ -53,7 +53,7 @@ select(mpg,cty,hwy)%>%
   mutate(ctyMetric=0.425144*cty,hwyMetric=0.425144*hwy)->mpgMet
 mpgMet
 
-###
+### summarise data
 library(tidyverse)
 
 txhousing%>%
@@ -65,4 +65,66 @@ txhousing%>%
   group_by(year,city)%>%
   summarise(totalsales=sum(sales,na.rm = TRUE))->totsales2
 totsales2
-  
+
+##reshaping and joining data
+
+library(tidyverse)
+
+## use wide to reshaping
+
+ggplot(economics, aes(x=uempmed,y=psavert))+
+  geom_point()
+economics
+
+##use long to reshaping
+
+economics_long
+ggplot(economics_long, aes(x=date,y=value))+
+  geom_line()+
+  facet_wrap(~variable, scales = "free_y")
+
+##from wide to long
+
+pivot_longer(economics,cols = -date,
+             names_to = "variable",
+             values_to = "value")->long
+
+long
+
+##from long to wide
+economics_long%>%
+  pivot_wider(id_cols = date,
+              names_from=variable,
+              values_from=value)->wide
+
+wide
+
+##combine two data frame---joined data
+
+energy<-read_csv("energydata.csv")
+energy
+
+weather<-read_csv("weather.csv")
+weather
+
+##joining by=c("Date","State")
+##inner_join(x,y)--return all rows from x with matching values in y.
+
+all_data1<-inner_join(energy,weather)
+all_data1
+
+##left_join(x,y)--return all rows from x with matching values in y, with NA if there no match
+
+all_data2<-left_join(energy,weather)
+all_data2
+
+##right_join(x,y)--return all rows from y with matching values in x, with NA if there no match
+
+all_data3<-right_join(energy,weather)
+all_data3
+
+##full_join(x,y)--return all rows from x or y, with NA if there no match
+
+all_data4<-full_join(energy,weather)
+all_data4
+
