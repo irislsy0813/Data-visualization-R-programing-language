@@ -3,6 +3,10 @@ library(ggplot2)
 library(ggthemes)
 library(tidyverse)
 
+## chenge theme 
+## theme_economist()
+## theme_bw()
+
 economics%>%
   ggplot(aes(x=psavert,y=uempmed))+
   geom_point()+
@@ -12,10 +16,8 @@ economics%>%
   ylab("ylab")+
   annotate("text",x=4,y=24,label="bad times",size=3,color="red")
 
-## chenge theme 
-## theme_economist()
-## theme_bw()
 
+###在line 里group 多个time serise 的趋势(单位或y一样)
 
 txhousing%>%
   filter(city=="Houston", date>2010)%>%
@@ -32,7 +34,8 @@ houston_sales_listings_long
   geom_line()
 
   
-##coord_fixed(ratio = ***) 调整y轴和x轴
+##coord_fixed(ratio = ***) 当多个变量单位不一致-调整y轴和x轴
+
   houston_sales_listings%>%
     ggplot(aes(x=date,y=sales))+
     geom_line()+
@@ -44,12 +47,12 @@ houston_sales_listings_long
     geom_line()+
     coord_fixed( 0.0001)
 
-##geom_path 多个time serise 的趋势
+##geom_path 在plot里有多个time serise 的趋势
   
   houston_sales_listings%>%
     ggplot(aes(x=listings,y=sales, col=date))+
     geom_path()+
-    scale_color_viridis_c()
+    scale_color_viridis_c() ##改颜色
   
 ##with fitted curve
 
@@ -64,3 +67,29 @@ houston_sales_listings_long
   ggplot(mpg,aes(x=displ,y=cty,col=drv))+
     geom_point()+
     geom_smooth(method="lm")
+    
+ ## Interactive Plots 交互图-ploty
+ 
+ txhousing%>%
+  filter(city==Houston", date>2010)%>%
+  select(date, sales, listing)>house_sales_listing2
+ 
+g<- house_sales_listing2%>%
+  ggplot(aes(x=listing,t=sales, col=date))
+  geom_point()+
+  scale_color_viridis_c()
+ 
+ggplotly(g)
+  
+g2<-house_sales_listing2%>%
+  mutate(Era=ifelse(date>2014,"Post 2014","pre_2014"))%>%
+  ggplot(aes(x=listing,y=sales, col=Era))+
+  geom_point()
+    
+ggplotly(g2)
+ 
+ 
+ 
+ 
+ 
+ 
