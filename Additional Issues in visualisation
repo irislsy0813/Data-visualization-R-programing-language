@@ -56,19 +56,20 @@ houston_sales_listings_long
   
 ##with fitted curve
 
-##smooth 回归线 se=FALSE 取消置信区间 span 平滑度 methods="lm"/"gam"/"loess"
+##smooth 回归线 se=FALSE 取消置信区间（confidence brand） span 平滑度 methods="lm"/"gam"/"loess"
 ## lm =线性回归，glm =广义线性回归，gam =广义加性模型，loess=局部回归
   
   ggplot(mpg,aes(x=displ,y=cty))+
     geom_point()+
     geom_smooth(span=0.5, se=FALSE, methods="lm")
   
-  ## 
+  ## geom_smooth using formula "y~x"
+  
   ggplot(mpg,aes(x=displ,y=cty,col=drv))+
     geom_point()+
     geom_smooth(method="lm")
     
-    
+  ##一般来讲数据越少置信区间越大,有预测置信区间越大，回归线周围数据越密集，模型越好。  
     
  ## Interactive Plots 交互图-ploty
  
