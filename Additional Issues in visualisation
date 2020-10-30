@@ -88,7 +88,7 @@ g2<-house_sales_listing2%>%
     
 ggplotly(g2)
  
- 
+其他交互图shiny 
  
  
  
