@@ -1,0 +1,58 @@
+library(MASS)
+library(ggplot2)
+library(tidyverse)
+library(viridis)
+
+n<-nrow(mpg)
+train_or_test<-ifelse(runif(n)<0.7,'Train','Test')  ##把所有数据分成train和test，runif min = 0, max = 1随机数。
+table(train_or_test)  ##table可以查看不同变量总数
+
+mpg_exp<-add_column(mpg,Sample=train_or_test)
+view(mpg_exp)
+
+mpg_train<-filter(mpg_exp,Sample=='Train')
+mpg_test<-filter(mpg_exp,Sample=='Test')
+
+summary(mpg_train)
+summary(mpg_test)  ##两者的mean很接近即为好
+
+##lda a
+
+lda_out<-lda(drv~displ+hwy,data = mpg_train)##找规律
+
+ldapred<-predict(lda_out,mpg_test)##对实验数据mpg_test做预测
+
+##Missclasification Rate
+
+mean(ldapred$class!=mpg_test$drv) ##错误概率
+
+table(ldapred$class,mpg_test$drv)
+
+### qda
+
+qda_out<-qda(drv~displ+hwy,data = mpg_train) ##找规律
+
+qdapred<-predict(qda_out,mpg_test) ##对实验数据mpg_test做预测
+
+##Missclasification Rate
+
+mean(qdapred$class!=mpg_test$drv)
+
+table(qdapred$class,mpg_test$drv)
+
+table(qdapred$class,ldapred$class) ##row, col
+
+
+### Evaluate whether the assumptions of multivariate normality and homogenous variances and covariances hold.
+
+mpg_train%>%
+  group_by(drv)%>%
+  summarise(VarDispl=var(displ),
+            VarHwy=var(hwy),
+            covDisplHwy=cov(displ,hwy))->varcov 
+## `summarise()` ungrouping output (override with `.groups` argument)
+
+mpg_train%>%
+  ggplot(aes(x=displ,y=hwy,col=drv))+
+  geom_density2d()+
+  scale_color_colorblind()
