@@ -1,0 +1,53 @@
+library(rpart)
+library(ggplot2)
+library(rpart.plot)
+
+
+#Find total number of observations
+n<-NROW(mpg)
+
+#Create a vector allocating each observation to train #or test 
+train_or_test<-ifelse(runif(n)<0.7,'Train','Test') 
+
+#Add to mpg data frame 
+mpg_exp<-add_column(mpg,Sample=train_or_test) 
+
+#Isolate Training Data 
+mpg_train<-filter(mpg_exp,Sample=='Train')
+
+#Isolate Test Data
+mpg_test<-filter(mpg_exp,Sample=='Test')
+
+#Default Settings 画小树
+rpart_small<-rpart(drv~displ+hwy,data = mpg_train)
+
+#Bigger tree
+#Allow for partitions with as few as two #training observations
+#Accept any split that improves fit 
+rpart_big<-rpart(drv~displ+hwy,data = mpg_train,
+                 control = rpart.control(minbucket=2, cp=0))
+#Make predictions
+pred_small<-predict(rpart_small,mpg_test,type='class')
+pred_big<-predict(rpart_big,mpg_test,type='class')
+
+##To compute test misclassification
+mean(pred_small!=mpg_test$drv)
+mean(pred_big!=mpg_test$drv)
+
+table(pred_small,mpg_test$drv)
+
+##In the bigger tree perform better out-of-sample (this is rare).
+
+## Probabilities
+
+pred_small<-predict(rpart_small,mpg_test) 
+pred_small
+
+##Plotting the trees 画树
+
+rpart.plot(rpart_small,extra = 0,type = 0)
+rpart.plot(rpart_big,extra = 0,type = 0)
+
+##rpart.plot actually provides more information. 
+
+rpart.plot(rpart_small)
