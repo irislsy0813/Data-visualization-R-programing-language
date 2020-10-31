@@ -56,3 +56,10 @@ mpg_train%>%
   ggplot(aes(x=displ,y=hwy,col=drv))+
   geom_density2d()+
   scale_color_colorblind()
+
+####
+Double Cross Validation（2-fold Cross Validation，记为2-CV）
+做法是将数据集分成两个相等大小的子集，进行两回合的分类器训练。在第一回合中，一个子集作为training set，另一个便作为testing set；
+在第二回合中，则将training set与testing set对换后，再次训练分类器，而其中我们比较关心的是两次testing sets的辨识率。
+不过在实务上2-CV并不常用，主要原因是training set样本数太少，通常不足以代表母体样本的分布，导致testing阶段辨识率容易出现明显落差。
+此外，2-CV中分子集的变异度大，往往无法达到“实 验过程必须可以被复制”的要求。
