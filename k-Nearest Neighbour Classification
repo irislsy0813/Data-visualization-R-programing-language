@@ -1,0 +1,54 @@
+library(class)
+
+load('knnexample.RData')
+
+###数据整理成一样的scale
+
+train_x
+
+train_x_std<-scale(train_x)
+
+mean_train_x<-attr(train_x_std,"scaled:center")
+std_train_x<-attr(train_x_std,"scaled:scale")
+
+###test数据整理
+test_x_std<-scale(test_x,
+                  center=mean_train_x,
+                  scale = std_train_x)
+
+##假设k=1用算出knn的预测结果yhat
+knn(train_x_std,test_x_std,train_y,k=1) ->yhat_k1
+print(yhat_k1)
+
+##错误分类概率（misclassification）当test_y!=yhat_k1
+
+miscl_k1<-mean(test_y!=yhat_k1)
+
+print(miscl_k1)
+
+##假设k=5用算出knn的预测结果yhat
+
+knn(train_x_std,test_x_std,train_y,k=5) ->yhat_k5
+print(yhat_k5)
+
+miscl_k5<-mean(test_y!=yhat_k5)
+
+print(miscl_k5)
+
+##Sensitivity and specificity，Letting "default" be the "positive" class
+##sensitivity is 8/(8+52) or 0.133, and specificity is 169/(21+169) or 0.889
+table(test_y,yhat_k5)
+
+##add probabilities in knn
+
+knn(train_x_std, test_x_std,
+    train_y,k=5,prob = TRUE)->prob_k5
+
+prob_k5
+
+##或者
+
+print(prob_k5)
+
+print(attr(prob_k5,"prob"))
+
