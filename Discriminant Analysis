@@ -16,7 +16,7 @@ mpg_test<-filter(mpg_exp,Sample=='Test')
 summary(mpg_train)
 summary(mpg_test)  ##两者的mean很接近即为好
 
-##lda a
+##lda（trainningy~trainningx, data=trainning data）
 
 lda_out<-lda(drv~displ+hwy,data = mpg_train)##找规律
 
@@ -57,6 +57,76 @@ mpg_train%>%
   geom_density2d()+
   scale_color_colorblind()
 
+######################练习##############
+#Use MASS package
+library(MASS)
+#Later tidyverse also used
+library(tidyverse)
+
+#Load in data
+ExistingWines<-readRDS('ExistingWines.rds')
+
+##Carry out Linear Discriminant Analysis (LDA) using all data in ExistingWines.rds in the training set and predict the data in NewWines.rds.
+#Load in New Wine Data
+
+NewWines<-readRDS('NewWines.rds')
+ldaout<-lda(BestMarket~.,data = ExistingWines)
+ldaout
+
+##newdata = NewWines = test datda
+yhat_lda<-predict(ldaout,newdata = NewWines)
+
+##What are the predictions for the first ten wines in the NewWines.rds
+head(yhat_lda$class,10)
+
+head(yhat_lda$posterior,10)
+
+##Repeat the analyis using Quadratic Disciminant Analysis (QDA).
+
+qdaout<-qda(BestMarket~.,data = ExistingWines)
+yhat_qda<-predict(qdaout,newdata = NewWines)
+head(yhat_qda$class,10)
+
+##Split the data in ExistingWines.rds into a training sample (of roughly 70%) and a test sample (of roughly 30%).
+#Create an indicator that determines whether it is training or test sample.
+
+ind<-ifelse(runif(125)<0.7,"Training Sample","Test Sample")
+
+#A data set augmented with sample information
+Data_with_Sample<-add_column(ExistingWines,Sample=ind)
+
+#Get Training data
+train_data<-Data_with_Sample%>%
+  filter(Sample=="Training Sample")%>%
+  select(-Sample) #Can remove Sample variable
+
+#Get Test data
+test_data<-Data_with_Sample%>%
+  filter(Sample=="Test Sample")%>%
+  select(-Sample) #Can remove Sample variable
+
+## Is LDA better than QDA for this data?
+ldaout<-lda(BestMarket~.,data = train_data)
+yhat_lda<-predict(ldaout,newdata = test_data)
+mean(yhat_lda$class!=test_data$BestMarket)
+
+qdaout<-qda(BestMarket~.,data = train_data)
+yhat_qda<-predict(qdaout,newdata = test_data)
+mean(yhat_qda$class!=test_data$BestMarket)
+
+##Under what assumptions would QDA theoretically be better than LDA. Investigate whether this assumption holds
+ExistingWines%>%
+  group_by(BestMarket)%>%
+  summarise_all(var)->Variances
+Variances
+
+##What other assumption is required for LDA or QDA to theoretically minimise misclassification rate? Think of a way to do a quick visual check of whether this assumption holds.
+#Both LDA and QDA are only optimal under normality
+
+ExistingWines%>%
+  gather(key = Variable, value = Value,-BestMarket)%>%
+  ggplot(aes(x=Value,col=BestMarket))+geom_density()+facet_wrap(~Variable,nrow = 4,scales = 'free')
+  
 ####
 Double Cross Validation（2-fold Cross Validation，记为2-CV）
 做法是将数据集分成两个相等大小的子集，进行两回合的分类器训练。在第一回合中，一个子集作为training set，另一个便作为testing set；
