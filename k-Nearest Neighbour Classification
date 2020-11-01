@@ -49,3 +49,72 @@ head(attr(prob_k5,"prob"),10) ##前十个
 
 print(attr(prob_k5,"prob")) ##所有
 
+
+##########################练习
+
+rm(list=ls())
+
+##Q1 Carry out kNN classification using all data in ExistingWines.rds in the training set andpredict the data in NewWines.rds. Let k = 1
+
+#Use tidyverse
+library(dplyr)
+library(class)
+
+#Load in data
+ExistingWines<-readRDS('ExistingWines.rds')
+
+#Split x and y variables and standardise
+
+old_x<-select(ExistingWines,-BestMarket)%>%scale() ##train x
+
+#Keep mean and standard deviation
+
+mean_old_x<-attr(old_x,"scaled:center")
+std_old_x<-attr(old_x,"scaled:scale")
+
+old_y<-pull(ExistingWines,BestMarket) ##train y
+
+#Load in New Wine Data
+new_x<-readRDS('NewWines.rds')%>%
+  scale(center = mean_old_x,scale = std_old_x)  ##test x
+
+  yhat_k1<-knn(old_x,new_x,old_y,k=1)
+
+## Q2 What are the predictions for the first ten wines in the NewWines.rds
+#The first ten predictions can be checked using the head function
+
+head(yhat_k1,10)
+
+#Q3 Repeat the analyis with k = 5
+#Same code as before different k argument
+
+yhat_k5<-knn(old_x,new_x,old_y,k=5)
+head(yhat_k5,10)
+
+# Q4 What are the predicted probabilities for the first ten wines in the NewWines.rds when k=5
+#Same as before but set prob to T
+
+yhat_k5<-knn(old_x,new_x,old_y,k=5,prob = T)
+#Use attr function to get probabilities
+
+head(attr(yhat_k5,"prob"),10)
+
+#Split the data in ExistingWines.rds into a training sample (of roughly 70%) and a test sample (of roughly 30%). 
+#Create an indicator that determines whether it is training or test sample.
+
+ind<-ifelse(runif(125)<0.7,"Training Sample","Test Sample")
+
+train_y<-old_y[ind=="Training Sample"]
+test_y<-old_y[ind=="Test Sample"]
+train_x<-old_x[ind=="Training Sample",]
+test_x<-old_x[ind=="Test Sample",]
+
+
+#Is k = 1 a better choice than k = 5 according to the misclassification rate?
+yhat_k1<-knn(train_x,test_x,train_y,k=1)
+mean(yhat_k1!=test_y)
+
+yhat_k5<-knn(train_x,test_x,train_y,k=5)
+mean(yhat_k5!=test_y)
+
+
