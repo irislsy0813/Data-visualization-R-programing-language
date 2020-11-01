@@ -42,13 +42,10 @@ table(test_y,yhat_k5)
 ##add probabilities in knn
 
 knn(train_x_std, test_x_std,
-    train_y,k=5,prob = TRUE)->prob_k5
+    train_y,k=5,prob = TRUE)->prob_k5 ##此时结果包含文字和概率
 
-prob_k5
+##仅提取概率
+head(attr(prob_k5,"prob"),10) ##前十个
 
-##或者
-
-print(prob_k5)
-
-print(attr(prob_k5,"prob"))
+print(attr(prob_k5,"prob")) ##所有
 
