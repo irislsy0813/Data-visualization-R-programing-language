@@ -1,0 +1,62 @@
+## A Data Munging
+
+rm(list=ls())
+
+library(tidyverse)
+library(ggplot2)
+library(rpart)
+library(rpart.plot)
+
+data<-read.csv("data29521262.csv")
+head(data)
+
+##1. What is the average GDP per capita for countries in the test set?
+
+TSdata<-filter(data, TrainTest=="Test")
+mean(TSdata$PerCapitaGDP)
+
+##2. What is the average GDP per capita for countries in the training set?
+
+TRdata<-filter(data, TrainTest=="Train")
+mean(TRdata$PerCapitaGDP)
+
+## 3. How does your answer to Q1 change if we only consider countries for which the services industry is the largest industry?
+
+TSdata2<-filter(data, (LargestIndustry=="Services")&(TrainTest=="Test"))
+mean(TSdata2$PerCapitaGDP)
+
+##B Basic Visualisation
+
+##1. Plot a scatterplot of GDP per capita (y axis) against Debt to GDP ratio (x axis).
+
+ggplot(data,map=aes(x=DebtGDP, y=PerCapitaGDP))+
+  geom_point(position = "jitter")+
+  geom_smooth(color = "skyblue", fill = "skyblue", method = "lm")
+
+##2. Describe the relationship between GDP per capita and Debt to GDP ratio. Is there enough evidence to conclude that any relationship is a causal relationship?
+
+Negative relationship but no causal relationship.Because visualizations like a scatterplot only give association not causal. 
+
+##3. Plot the same plot as Question 1 only this time facet by credit rating. Allow each fact to have its own values on the y axis.
+
+ggplot(data,map=aes(x=DebtGDP, y=PerCapitaGDP))+
+  geom_point(position = "jitter")+
+  facet_wrap(~CreditRating, nrow=5, ncol=2, scale="free_y")
+
+##C Classification tree
+
+##1. Fit a classification tree to all the data with Largest Industry as the target variable debt to GDP as the predictor. Generate a plot of the tree.
+
+rpart_small<-rpart(LargestIndustry~DebtGDP,data = TRdata)
+rpart.plot(rpart_small)
+
+##2. What Industry would the tree predict for a country with a Debt to GDP ratio of 90.31 percentage points?
+
+Aguriculture
+
+##3. Explain how a classification tree is constructed
+
+The algorithm considers all possible splits for all possible variables. The variable and split is chosen based on what best
+seperates the categories of the target variable by some criterion (e.g., Gini coefficient). A number of criteria can be used to
+decide when to stop building tree. Some of these things include setting a minimum number of observations in each bin, stopping when
+the Gini coefficient C〇r the criterion) is no longer improved by more than a threshold or when a maximum tree depth is achieved. |
