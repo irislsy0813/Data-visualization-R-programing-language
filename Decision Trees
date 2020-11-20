@@ -19,7 +19,7 @@ mpg_train<-filter(mpg_exp,Sample=='Train')
 mpg_test<-filter(mpg_exp,Sample=='Test')
 
 #Default Settings 画小树
-rpart_small<-rpart(drv~displ+hwy,data = mpg_train)
+rpart_small<-rpart(drv~displ+hwy,data = mpg_train). ## drv as the target variable, displ+hwy as the predictor
 
 #Bigger tree
 #Allow for partitions with as few as two #training observations
