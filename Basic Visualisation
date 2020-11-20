@@ -31,9 +31,11 @@ ggplot(data=diamonds, mapping=aes(x=cut, y=price))+
 ggplot(data=diamonds, mapping = aes(x=cut, y=price))+
   geom_violin()+
   coord_flip()
-
+  
+## 回归线
 ggplot(data=mpg, mapping = aes(x=cyl, y=cty))+
-  geom_point(position = "jitter")
+  geom_point(position = "jitter")+
+   geom_smooth(color = "skyblue", fill = "skyblue", method = "lm")
   
  ####
  library(tidyverse) will load the core tidyverse packages:ggplot2, for data visualisation. (画图，可视化数据) dplyr, for data manipulation. 
