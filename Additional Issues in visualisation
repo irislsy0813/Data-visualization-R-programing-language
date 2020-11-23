@@ -82,7 +82,7 @@ g<- house_sales_listing2%>%
   geom_point()+
   scale_color_viridis_c()
  
-ggplotly(g)
+ggplotly(g) ##交互图可以用于寻找异常值
   
 g2<-house_sales_listing2%>%
   mutate(Era=ifelse(date>2014,"Post 2014","pre_2014"))%>%
@@ -93,6 +93,67 @@ ggplotly(g2)
  
 其他交互图shiny 
  
+ ################################################
  
- 
+ rm(list = ls())
+library(ggplot2)
+
+electricity<-read_csv("electricity.csv")
+
+## Add smooth lines obtained by a LOESS estimate.
+
+electricity%>%
+  ggplot(aes(y=Demand,x=MaxTemp,col=Wend))+
+  geom_point()+
+  geom_smooth(method = 'loess')
+
+## Add the line of best fit from a linear regression model.
+
+ggplot(electricity,aes(x=MaxTemp,y=Demand,col=Wend))+
+  geom_point()+geom_smooth(method = 'lm')
+
+##Using plotly investigate the outlier 用交互图解释异常值
+
+library(plotly)
+g<-ggplot(electricity,aes(x=MaxTemp,
+                   y=Demand,
+                   col=Wend,
+                   text=Date))+geom_point()
+ggplotly(g)
+
+###Create a path plot of the yearly exports to Germany against the yearly exports to the USA.数据处理！！！
+
+##替换缺少值
+SwissWide<-read_csv('SwissExportsFull.csv')%>%
+  rename(`NA`=X154)
+
+#Convert to long form 变长用于分类
+
+SwissLong<-pivot_longer(data = SwissWide,
+                        cols = c(-Date, -Year),   #Do not use these variables
+                        names_to = 'Country',     #Column names become variable
+                        values_to = 'Exports')    #All numbers are exports
+
+#Create yearly aggregate
+
+SwissLong%>%                    #This is much easier with long data
+  select(-Date)%>%              #Eventually cannot aggregate dates
+  group_by(Year,Country)%>%
+  summarise(YearlyExports=sum(Exports))->SwissYearly
+
+#Select Germany and US
+
+SwissYearly%>%
+  filter(Country %in% c('DE','US'))%>%
+  pivot_wider(id_cols = Year,
+              names_from = Country,
+              values_from = YearlyExports)->Exports_DE_US
+
+#Finally make plot
+
+ggplot(Exports_DE_US,aes(x=DE,y=US,col=Year,label=Year))+
+  geom_path()+
+  scale_color_viridis_c()+
+  geom_text()
+
  
