@@ -128,3 +128,94 @@ all_data3
 all_data4<-full_join(energy,weather)
 all_data4
 
+
+############
+
+swissef<-read.csv("SwissExportsFull.csv")
+
+## long,wide 转换
+pivot_longer(swissef, cols =c( -Date,-Year),
+             names_to = "Country",
+             values_to = "value")->long
+long
+
+long%>% 
+  group_by(Year,Country)%>%
+  summarise(YearlyExports=sum(value))->SwissYearly
+
+SwissYearly
+
+##filter 筛选所有year==1988和2018的数据
+SwissYearly%>%
+  filter(Year %in% c(1988,2018))%>% #Filter years
+  pivot_wider(id_cols = Country,
+              names_from = Year,
+              values_from = YearlyExports)-> #Need to widen
+  
+SwissYearlyWide
+
+## 画图
+SwissYearlyWide%>%
+  ggplot(aes(x=`1988`,y=`2018`))+
+  geom_point()+
+  scale_x_log10()+scale_y_log10()
+
+##filter 筛选不等于零的数据
+
+SwissYearlyWide%>%
+  filter((`1988`!=0)&(`2018`!=0))%>% #Filter years
+  ggplot(aes(x=`1988`,y=`2018`))+
+  geom_point()+
+  scale_x_log10()+scale_y_log10()
+
+
+apple<-read.csv("apple_options.csv")
+
+##gsub替换（原数，替换，目标）
+gsub('%','','25%')%>%as.numeric()/100
+
+gsub('%','','1.32%')%>%as.numeric()/100
+
+##将百分数换成小数
+apple%>%
+  mutate(ImpliedVol=gsub('%','',`Implied.volatility`)%>%as.numeric()/100)
+
+## find the expiry date（group by） that has the most put options (filter).
+apple%>%
+  filter(Type=='Put')%>%
+  group_by(`Expiry.date`)%>%
+  summarise(TotalOptions=n())
+
+apple%>%
+  mutate(ImpliedVol=gsub('%','',`Implied.volatility`)%>%as.numeric()/100)%>%
+  filter(Type=='Put',Strike.Price>250,`Expiry.date`=='2020-05-29')
+
+## find the median value of Implied Volatility(summarise) for each Strike Price (group by).
+apple%>%
+  mutate(ImpliedVol=gsub('%','',`Implied.volatility`)%>%as.numeric()/100)%>%
+  filter(Type=='Put',Strike.Price>250,`Expiry.date`=='2020-05-29')%>%
+  group_by(Strike.Price)%>%
+  summarise(MedIV=median(ImpliedVol,na.rm = T))
+
+apple%>%
+  mutate(ImpliedVol=gsub('%','',`Implied.volatility`)%>%as.numeric()/100)%>%
+  filter(Type=='Put',`Expiry.date`=='2020-05-29',`Strike.Price`>250)%>%
+  group_by(`Strike.Price`)%>%
+  summarise(MedIV=median(`ImpliedVol`,na.rm = T))%>%
+  ggplot(aes(x=`Strike.Price`,y=MedIV))+geom_line()
+
+
+##
+library(rvest)
+
+url<-'https://au.finance.yahoo.com/quote/AAPL/options?strike=180&straddle=false'
+
+url%>%
+  read_html%>%
+  html_table()->data
+
+##A better database would store these as two separate variables.
+## Another point worth mentioning is that even the variable name might not be considered to be atomic. 
+## For example in some contexts it may be important to serparate family name from given names
+
+
