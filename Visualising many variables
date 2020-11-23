@@ -168,3 +168,70 @@ df %>%
     panel.spacing = unit(0.3, "inch") #分面间隔 ,
     # strip.switch.pad.grid =
   )
+
+############################
+
+rm(list = ls())
+
+## 目的：根据地点绘出出口量
+SwissExportFull<-read.csv("SwissExportsFull.csv")  
+head(SwissExportFull)
+
+## 变长(pivot_longer)，分类（group by），合并（summarise）
+SwissExportFull%>%
+  pivot_longer(cols =c(-Date,-Year),
+              names_to="Country",
+              values_to="Export")%>%
+  group_by(Year,Country)%>%
+  summarise(YearlyExports=sum(Export))->SwissExportFull_long
+
+##将上面的数据画线，分面
+SwissExportFull_long%>%
+  filter(Country %in% c("DE","US","CN","IN"))%>%
+  group_by(Country)%>%
+  ggplot(aes(x=Year, y=YearlyExports))+
+  geom_line()+
+  facet_wrap(~Country)
+
+##将上面的数据画线，颜色有意义（col=Country），分面
+SwissExportFull_long%>%
+  filter(Country %in% c("DE","US","CN","IN"))%>%
+  group_by(Country)%>%
+  ggplot(aes(x=Year, y=YearlyExports,col=Country))+
+  geom_line()
+
+## 目的：画线，颜色有意义（col），图内文字（text,label），log
+SwissExp<-readRDS('SwissExport.rds')
+SwissExp%>%
+  filter((ExportsJan1988!=0)&(ExportsDec2018!=0))%>%
+  ggplot(aes(x=ExportsJan1988,
+             y=ExportsDec2018,
+             label=Country,
+             col=Region))+
+  geom_text(size=2)+
+  scale_x_log10()+scale_y_log10()
+
+## 将分面打印出来
+library(tidyverse)
+SwissExp%>%
+  filter((ExportsJan1988!=0)&(ExportsDec2018!=0))%>%
+  ggplot(aes(x=ExportsJan1988,
+             y=ExportsDec2018,
+             label=Country))+
+  geom_text(size=2)+
+  scale_x_log10()+scale_y_log10()
+
+  facet_wrap(~Region,nrow = 4)
+
+
+USState<-readRDS('USStateData.rds')
+
+##画 bubble chart（size有含义的scatter chart）
+ggplot(USState,mapping = aes(x=Income,y=`Life Exp`, size=Population, col=Region,label=Abbreviation))+
+  geom_point()+
+  geom_text(col="black",size=2)
+
+## ggpairs plot.
+library(GGally)
+StateRed<-readRDS('USStateRed.rds')
+ggpairs(StateRed)
