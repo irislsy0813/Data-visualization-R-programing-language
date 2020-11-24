@@ -117,4 +117,69 @@ mean(yhat_k1!=test_y)
 yhat_k5<-knn(train_x,test_x,train_y,k=5)
 mean(yhat_k5!=test_y)
 
+###############################################
+
+#Use tidyverse
+
+library(dplyr)
+library(class)
+
+#Load in data
+
+ExistingWines<-readRDS('ExistingWines.rds')
+
+#Split x and y variables and standardise
+
+train_x<-select(ExistingWines,-BestMarket)
+
+##标准化数据
+old_x<-scale(train_x)  ------train_x
+
+#Keep mean and standard deviation
+
+mean_old_x<-attr(old_x,"scaled:center")
+
+std_old_x<-attr(old_x,"scaled:scale")
+
+old_y<-pull(ExistingWines,BestMarket) ------train_y
+
+#Load in New Wine Data
+
+new_x<-readRDS('NewWines.rds')%>%  
+
+scale(center = mean_old_x,scale = std_old_x)  ------test_x
+
+yhat_k1<-knn(old_x,new_x,old_y,k=1)
+
+head(yhat_k1,10)
+
+#Same code as before different k argument
+
+yhat_k5<-knn(old_x,new_x,old_y,k=5)
+head(yhat_k5,10)
+
+#Same as before but set prob to T   计算概率
+
+yhat_k5<-knn(old_x,new_x,old_y,k=5,prob = T)
+
+#Use attr function to get probabilities 得到概率
+
+head(attr(yhat_k5,"prob"),10)
+
+#Create an indicator that determines whether it is training or test sample. 自主创建training 和 test
+
+ind<-ifelse(runif(125)<0.7,"Training Sample","Test Sample")
+
+train_y<-old_y[ind=="Training Sample"]
+test_y<-old_y[ind=="Test Sample"]
+train_x<-old_x[ind=="Training Sample",]
+test_x<-old_x[ind=="Test Sample",]
+
+yhat_k1<-knn(train_x,test_x,train_y,k=1)
+mean(yhat_k1!=test_y)
+
+yhat_k5<-knn(train_x,test_x,train_y,k=5)
+mean(yhat_k5!=test_y)
+
+
 
