@@ -64,12 +64,12 @@ library(MASS)
 library(tidyverse)
 
 #Load in data
-ExistingWines<-readRDS('ExistingWines.rds')
+ExistingWines<-readRDS('ExistingWines.rds').     -----train data
 
 ##Carry out Linear Discriminant Analysis (LDA) using all data in ExistingWines.rds in the training set and predict the data in NewWines.rds.
 #Load in New Wine Data
 
-NewWines<-readRDS('NewWines.rds')
+NewWines<-readRDS('NewWines.rds')              -----test data
 ldaout<-lda(BestMarket~.,data = ExistingWines)
 ldaout
 
@@ -81,31 +81,34 @@ head(yhat_lda$class,10)
 
 head(yhat_lda$posterior,10)
 
-##Repeat the analyis using Quadratic Disciminant Analysis (QDA).
+##Repeat the analyis using Quadratic Disciminant Analysis (QDA).     -------QDA
 
 qdaout<-qda(BestMarket~.,data = ExistingWines)
 yhat_qda<-predict(qdaout,newdata = NewWines)
 head(yhat_qda$class,10)
 
-##Split the data in ExistingWines.rds into a training sample (of roughly 70%) and a test sample (of roughly 30%).
+##Split the data in ExistingWines.rds into a training sample (of roughly 70%) and a test sample (of roughly 30%).-----自己分数据
 #Create an indicator that determines whether it is training or test sample.
 
 ind<-ifelse(runif(125)<0.7,"Training Sample","Test Sample")
 
 #A data set augmented with sample information
+
 Data_with_Sample<-add_column(ExistingWines,Sample=ind)
 
 #Get Training data
 train_data<-Data_with_Sample%>%
   filter(Sample=="Training Sample")%>%
-  select(-Sample) #Can remove Sample variable
+  select(-Sample)                                ##Can remove Sample variable
 
 #Get Test data
+
 test_data<-Data_with_Sample%>%
   filter(Sample=="Test Sample")%>%
-  select(-Sample) #Can remove Sample variable
+  select(-Sample)                                 #Can remove Sample variable
 
 ## Is LDA better than QDA for this data?
+
 ldaout<-lda(BestMarket~.,data = train_data)
 yhat_lda<-predict(ldaout,newdata = test_data)
 mean(yhat_lda$class!=test_data$BestMarket)
