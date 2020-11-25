@@ -125,13 +125,20 @@ ExistingWines%>%
   summarise_all(var)->Variances
 Variances
 
+conclusion:
+#Some of the variances are quite different to one another which is enough to violate the
+#assumption. If we were more thorough we would test for differences and also look at the
+#Covariances
 ##What other assumption is required for LDA or QDA to theoretically minimise misclassification rate? Think of a way to do a quick visual check of whether this assumption holds.
+
+
 #Both LDA and QDA are only optimal under normality 检查是否是normal distribution.
 
 ExistingWines%>%
   gather(key = Variable, value = Value,-BestMarket)%>%
   ggplot(aes(x=Value,col=BestMarket))+geom_density()+facet_wrap(~Variable,nrow = 4,scales = 'free')
 
+conclusion:
 #   Some of these look relatively normal but some do not. For example Hue for Japan is right skewed
 #   while Nonflavanoid Phenols for Japan are left skewed. Also Ash for Australia is bimodal.
 #   Note that even when the marginal distributions look normal (and here they do not) this does not
