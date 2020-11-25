@@ -51,3 +51,37 @@ rpart.plot(rpart_big,extra = 0,type = 0)
 ##rpart.plot actually provides more information. 
 
 rpart.plot(rpart_small)
+
+
+################### 练习 ############
+
+#Use MASS package
+
+library(rpart)
+
+#Later tidyverse also used
+
+library(tidyverse)
+
+#Load in data
+ExistingWines<-readRDS('ExistingWines.rds')
+
+#Load in New Wine Data
+
+NewWines<-readRDS('NewWines.rds')
+tree<-rpart(BestMarket~.,data = ExistingWines)
+yhat<-predict(tree,newdata = NewWines,type='class')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
