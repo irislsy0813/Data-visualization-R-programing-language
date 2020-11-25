@@ -131,7 +131,13 @@ Variances
 ExistingWines%>%
   gather(key = Variable, value = Value,-BestMarket)%>%
   ggplot(aes(x=Value,col=BestMarket))+geom_density()+facet_wrap(~Variable,nrow = 4,scales = 'free')
-  
+
+#   Some of these look relatively normal but some do not. For example Hue for Japan is right skewed
+#   while Nonflavanoid Phenols for Japan are left skewed. Also Ash for Australia is bimodal.
+#   Note that even when the marginal distributions look normal (and here they do not) this does not
+#   automatically imply that they are multivariate normal. A more thorough analysis would use formal tests for multivariate normality.
+
+
 ####
 Double Cross Validation（2-fold Cross Validation，记为2-CV）
 做法是将数据集分成两个相等大小的子集，进行两回合的分类器训练。在第一回合中，一个子集作为training set，另一个便作为testing set；
