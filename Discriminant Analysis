@@ -118,7 +118,7 @@ yhat_qda<-predict(qdaout,newdata = test_data)
 mean(yhat_qda$class!=test_data$BestMarket)
 
 ## Under what assumptions would QDA theoretically be better than LDA. Investigate whether this assumption holds
-## QDA is better if the variance covariance matrices are different for different groups
+## QDA is better if the variance covariance matrices are different for different groups 检查variance大不大
 
 ExistingWines%>%
   group_by(BestMarket)%>%
@@ -126,7 +126,7 @@ ExistingWines%>%
 Variances
 
 ##What other assumption is required for LDA or QDA to theoretically minimise misclassification rate? Think of a way to do a quick visual check of whether this assumption holds.
-#Both LDA and QDA are only optimal under normality
+#Both LDA and QDA are only optimal under normality 检查是否是normal distribution.
 
 ExistingWines%>%
   gather(key = Variable, value = Value,-BestMarket)%>%
