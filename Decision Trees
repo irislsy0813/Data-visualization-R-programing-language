@@ -66,20 +66,82 @@ library(tidyverse)
 #Load in data
 ExistingWines<-readRDS('ExistingWines.rds')
 
-#Load in New Wine Data
+#Load in New Wine Data 
 
 NewWines<-readRDS('NewWines.rds')
 tree<-rpart(BestMarket~.,data = ExistingWines)
-yhat<-predict(tree,newdata = NewWines,type='class')
+
+##画树
+library(rpart.plot)
+rpart.plot(tree)
+
+yhat<-predict(tree,newdata = NewWines,type='class')  —————预测 NewWines 
+
+#The first ten predictions can be checked using the head function
+
+head(yhat,10)
+
+## Requiring at least 15 training observations to be within each partition 
+
+tree15<-rpart(BestMarket~., data = ExistingWines,
+    control = rpart.control(minbucket = 15))
+    rpart.plot(tree15)
+
+#Get predictions
+
+yhat15<-predict(tree15,NewWines,type='class')
+  
+#The first ten predictions can be checked using the head function
+
+head(yhat15,10)
+
+## 随机自主创建数据
+#This is the same problem as last week. However since the lda and qda functions take in the data differently to the knn function
+#Create an indicator that determines whether it is training or test sample.
+
+ind<-ifelse(runif(125)<0.7,"Training Sample","Test Sample")
+
+#A data set augmented with sample information
+
+Data_with_Sample<-add_column(ExistingWines,Sample=ind)
+
+#Get Training data
+
+train_data<-Data_with_Sample%>%
+  filter(Sample=="Training Sample")%>%
+  select(-Sample)                         #Can remove Sample variable
+
+#Get Test data
+
+test_data<-Data_with_Sample%>%
+  filter(Sample=="Test Sample")%>%
+  select(-Sample)                        #Can remove Sample variable
 
 
+## 正常的树和minimum 15 observations 比较好坏
+## Tree without minimum 15 observations per bin
 
+tree<-rpart(BestMarket~.,data = train_data)
 
+yhat<-predict(tree,test_data,type='class')
 
+# Tree with minimum 15 observations per bin
 
+tree15<-rpart(BestMarket~.,data = train_data,
+    control = rpart.control(minbucket = 15))
+    
+yhat15<-predict(tree15,test_data,type='class') ————测试
 
+#Compare misclassification rate
 
+#Default tree
+mean(yhat!=test_data$BestMarket) ——————检验
 
+#Default tree
+mean(yhat15!=test_data$BestMarket)   ——————检验
+
+#For this particular example the more complicated tree performs better. Both perform worse
+#than LDA and QDA and k-NN with k=5. The more complicated tree performs equally to kNN with k=1.
 
 
 
